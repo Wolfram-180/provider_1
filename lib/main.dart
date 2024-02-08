@@ -1,17 +1,26 @@
 import 'dart:collection';
 
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
+
+String routeNameNew = '/new';
 
 void main() {
   runApp(
-    MaterialApp(
-      title: 'Test app',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
+    ChangeNotifierProvider(
+      create: (_) => BreadCrumbProvider(),
+      child: MaterialApp(
+        title: 'Test app',
+        theme: ThemeData(
+          colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+          useMaterial3: true,
+        ),
+        home: const HomePage(),
+        routes: {
+          routeNameNew: (context) => const Material(),
+        },
       ),
-      home: const HomePage(),
     ),
   );
 }
@@ -23,7 +32,25 @@ class HomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Home page'),
+        title: const Center(child: Text('Home page')),
+      ),
+      body: Center(
+        child: Column(
+          children: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pushNamed(routeNameNew);
+              },
+              child: const Text('Add new breadcrumb'),
+            ),
+            TextButton(
+              onPressed: () {
+                context.read<BreadCrumbProvider>().reset();
+              },
+              child: const Text('Reset'),
+            ),
+          ],
+        ),
       ),
     );
   }
