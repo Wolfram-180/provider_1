@@ -18,7 +18,7 @@ void main() {
         ),
         home: const HomePage(),
         routes: {
-          routeNameNew: (context) => const Material(),
+          routeNameNew: (context) => const NewBreadCrumbWidget(),
         },
       ),
     ),
@@ -37,6 +37,13 @@ class HomePage extends StatelessWidget {
       body: Center(
         child: Column(
           children: [
+            Consumer<BreadCrumbProvider>(
+              builder: (context, value, child) {
+                return BreadCrumbsWidget(
+                  breadCrumbs: value.items,
+                );
+              },
+            ),
             TextButton(
               onPressed: () {
                 Navigator.of(context).pushNamed(routeNameNew);
@@ -82,7 +89,7 @@ class BreadCrumb {
 class BreadCrumbProvider extends ChangeNotifier {
   final List<BreadCrumb> _items = [];
 
-  UnmodifiableListView<BreadCrumb> get item => UnmodifiableListView(_items);
+  UnmodifiableListView<BreadCrumb> get items => UnmodifiableListView(_items);
 
   void add(BreadCrumb breadCrumb) {
     for (final item in _items) {
@@ -115,6 +122,64 @@ class BreadCrumbsWidget extends StatelessWidget {
           );
         },
       ).toList(),
+    );
+  }
+}
+
+class NewBreadCrumbWidget extends StatefulWidget {
+  const NewBreadCrumbWidget({super.key});
+
+  @override
+  State<NewBreadCrumbWidget> createState() => _NewBreadCrumbWidgetState();
+}
+
+class _NewBreadCrumbWidgetState extends State<NewBreadCrumbWidget> {
+  late final TextEditingController _controller;
+
+  @override
+  void initState() {
+    _controller = TextEditingController();
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Add new breadcrumb'),
+      ),
+      body: Column(
+        children: [
+          TextField(
+            controller: _controller,
+            decoration: const InputDecoration(
+              hintText: 'Enter a new bread crumb here...',
+            ),
+          ),
+          TextButton(
+            onPressed: () {
+              final text = _controller.text;
+              if (text.isNotEmpty) {
+                final breadCrumb = BreadCrumb(
+                  isActive: false,
+                  name: text,
+                );
+                context.read<BreadCrumbProvider>().add(
+                      breadCrumb,
+                    );
+                Navigator.of(context).pop();
+              }
+            },
+            child: const Text('Add'),
+          ),
+        ],
+      ),
     );
   }
 }
