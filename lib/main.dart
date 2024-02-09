@@ -41,6 +41,7 @@ class HomePage extends StatelessWidget {
               builder: (context, value, child) {
                 return BreadCrumbsWidget(
                   breadCrumbs: value.items,
+                  onTapped: value.onTapped,
                 );
               },
             ),
@@ -99,25 +100,42 @@ class BreadCrumbProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  void onTapped(BreadCrumb breadCrumb) {
+    print(breadCrumb.uuid);
+    // notifyListeners();
+  }
+
   void reset() {
     _items.clear();
     notifyListeners();
   }
 }
 
+typedef OnBreadCrumbTapped = void Function(BreadCrumb);
+
 class BreadCrumbsWidget extends StatelessWidget {
+  final OnBreadCrumbTapped onTapped;
   final UnmodifiableListView<BreadCrumb> breadCrumbs;
-  const BreadCrumbsWidget({super.key, required this.breadCrumbs});
+  const BreadCrumbsWidget({
+    super.key,
+    required this.breadCrumbs,
+    required this.onTapped,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Wrap(
       children: breadCrumbs.map(
         (breadCrumb) {
-          return Text(
-            breadCrumb.title,
-            style: TextStyle(
-              color: breadCrumb.isActive ? Colors.blue : Colors.black,
+          return GestureDetector(
+            onTap: () {
+              onTapped(breadCrumb);
+            },
+            child: Text(
+              breadCrumb.title,
+              style: TextStyle(
+                color: breadCrumb.isActive ? Colors.blue : Colors.black,
+              ),
             ),
           );
         },
